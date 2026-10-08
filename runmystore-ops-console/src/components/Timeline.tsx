@@ -31,9 +31,9 @@ export function Timeline({ filters, bots, clients, initial, showFilters = true, 
   const filtersKey = JSON.stringify(filters);
   const botsById = useMemo(() => new Map(bots.map((b) => [b.id, b])), [bots]);
 
-  // Live layer: only when the view includes "now" (no upper date bound in the past).
+  // Live layer stays subscribed (so the connection pill is truthful); its rows are merged only when the view includes "now".
   const live = useLiveEvents({
-    clientId, botId: filters.bot, bots, enabled: !historical,
+    clientId, botId: filters.bot, bots,
     lanes: filters.lane ? [filters.lane as Lane] : undefined,
     types: filters.type ? [filters.type as EventType] : undefined,
     limit: 0,
@@ -76,9 +76,9 @@ export function Timeline({ filters, bots, clients, initial, showFilters = true, 
     const seen = new Set<string>();
     const out: Event[] = [];
     const matchesStatus = (e: Event) => (!filters.status || e.status === filters.status) && (!filters.channel || e.channel === filters.channel) && (!fromIso || e.occurred_at >= fromIso);
-    for (const e of [...live.events.filter(matchesStatus), ...older]) { if (!seen.has(e.id)) { seen.add(e.id); out.push(e); } }
+    for (const e of [...(historical ? [] : live.events.filter(matchesStatus)), ...older]) { if (!seen.has(e.id)) { seen.add(e.id); out.push(e); } }
     return out;
-  }, [live.events, older, filters.status, filters.channel, fromIso]);
+  }, [live.events, older, filters.status, filters.channel, fromIso, historical]);
   const groups = useMemo(() => {
     const g: { day: string; label: string; rows: Event[] }[] = [];
     for (const e of rows) {
