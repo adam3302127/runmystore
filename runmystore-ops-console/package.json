@@ -6,7 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:local:reset": "scripts/local/db.sh reset",
+    "db:local:test": "scripts/local/db.sh test",
+    "functions:test": "cd supabase/functions && ../../node_modules/.bin/deno test --allow-net --allow-env --allow-read .",
+    "functions:local": "cd supabase/functions && ../../node_modules/.bin/deno run --allow-net --allow-env --allow-read _shared/local-stack.ts",
+    "simulate": "tsx scripts/simulate.ts",
+    "import": "tsx scripts/import-events.ts",
+    "test:e2e": "playwright test",
+    "screenshots": "playwright test tests/screenshots.spec.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

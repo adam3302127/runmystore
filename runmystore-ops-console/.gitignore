@@ -44,3 +44,6 @@ next-env.d.ts
 !.env.example
 # local harness output
 /screenshots/*.png
+/screenshots/*.png
+/tests/results/
+/tests/report/
