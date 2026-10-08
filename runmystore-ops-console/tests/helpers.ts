@@ -41,6 +41,7 @@ export async function signIn(page: Page, email: string) {
   const { data, error } = await a.auth.admin.generateLink({ type: "magiclink", email });
   if (error || !data.properties?.hashed_token) throw new Error(`generateLink failed: ${error?.message}`);
   await page.goto(`/auth/confirm?token_hash=${data.properties.hashed_token}&type=magiclink&next=/`);
+  await page.getByRole("button", { name: /Continue/ }).click();
   await page.waitForURL((u) => !u.pathname.startsWith("/auth/"), { timeout: 20_000 });
 }
 
