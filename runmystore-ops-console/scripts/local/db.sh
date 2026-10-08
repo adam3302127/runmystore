@@ -13,11 +13,13 @@ apply() {
   local db="$1"
   sudo -u postgres dropdb --if-exists "$db"
   sudo -u postgres createdb "$db"
+  sudo -u postgres psql -q -X -c "alter role postgres password 'postgres'" >/dev/null
   "${PSQL[@]}" -d "$db" -f "$HERE/supabase-stubs.sql"
   for m in "$ROOT"/supabase/migrations/*.sql; do
     echo "applying $(basename "$m")"; "${PSQL[@]}" -d "$db" -f "$m"
   done
   echo "seeding"; "${PSQL[@]}" -d "$db" -f "$ROOT/supabase/seed.sql"
+  echo "DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/$db"
 }
 
 case "$cmd" in
