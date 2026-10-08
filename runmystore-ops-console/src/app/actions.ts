@@ -1,5 +1,6 @@
 "use server";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { requireViewer } from "@/lib/viewer";
@@ -111,9 +112,11 @@ export async function inviteTeammate(form: FormData): Promise<Result> {
   if (!["owner", "admin", "operator", "viewer"].includes(role)) return { ok: false, error: "Bad role." };
   if (role === "owner" && viewer.member.role !== "owner") return { ok: false, error: "Only an owner can add another owner." };
   const admin = supabaseAdmin();
+  const h = await headers();
+  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
   // Invite (or find) the auth user with the service key, server-side only.
   let userId: string | null = null;
-  const invited = await admin.auth.admin.inviteUserByEmail(email, { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/auth/confirm` });
+  const invited = await admin.auth.admin.inviteUserByEmail(email, { redirectTo: `${origin}/auth/confirm` });
   if (invited.data.user) userId = invited.data.user.id;
   else {
     const list = await admin.auth.admin.listUsers({ perPage: 1000 });

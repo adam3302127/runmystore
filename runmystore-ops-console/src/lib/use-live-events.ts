@@ -106,7 +106,12 @@ export function useLiveEvents(opts: LiveOptions) {
     const filter = botId ? `bot_id=eq.${botId}` : clientId ? `client_id=eq.${clientId}` : undefined;
     const name = `live:${botId ?? clientId ?? "all"}:${Math.random().toString(36).slice(2, 8)}`;
     let wasLive = false;
-    const channel: RealtimeChannel = sb.channel(name)
+    let channel: RealtimeChannel | null = null;
+    let disposed = false;
+    sb.auth.getSession().then(({ data }: { data: { session: { access_token: string } | null } }) => {
+      if (disposed) return;
+      if (data.session?.access_token) sb.realtime.setAuth(data.session.access_token);
+      channel = sb.channel(name)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "events", ...(filter ? { filter } : {}) }, (p: RealtimePostgresChangesPayload<Event>) => ingest(scopeKey, [p.new as Event], true))
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "events", ...(filter ? { filter } : {}) }, (p: RealtimePostgresChangesPayload<Event>) => {
         const row = p.new as Event;
@@ -128,7 +133,8 @@ export function useLiveEvents(opts: LiveOptions) {
         } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") update("offline");
         else if (status === "CLOSED") update("connecting");
       });
-    return () => { sb.removeChannel(channel); };
+    });
+    return () => { disposed = true; if (channel) sb.removeChannel(channel); };
   }, [clientId, botId, enabled, scopeKey, ingest, query, update]);
 
   const setPaused = useCallback((p: boolean) => {
