@@ -50,3 +50,6 @@ next-env.d.ts
 /supabase/functions/.local-ca.crt
 /supabase/.temp/
 /supabase/.branches/
+
+# real customer history, never committed
+/agency-dashboard/backfill/
