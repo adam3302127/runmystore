@@ -9,3 +9,5 @@ export function publicEnv() {
 }
 export const DEFAULT_TZ = process.env.NEXT_PUBLIC_DEFAULT_TZ || "America/New_York";
 export const CLOSE_BASE = "https://app.close.com";
+/** Shows "Continue with Google" on /login. The provider itself is enabled in the Supabase dashboard. */
+export const GOOGLE_AUTH = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "1";

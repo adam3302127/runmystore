@@ -11,11 +11,11 @@ import { Eyebrow, Empty } from "@/components/Stripes";
 import type { DailySummary } from "@/lib/daily-summary";
 import { useScopedHref } from "@/components/ClientScope";
 
-export function ClientPage({ client, bots: initial, sparks, week, summary, summaryDayLabel }: {
-  client: Client; bots: Bot[]; sparks: Record<string, number[]>; week: ClientStats | null; summary: DailySummary; summaryDayLabel: string;
+export function ClientPage({ client, bots: initial, sparks, week, summary, summaryDayLabel, serverNow }: {
+  client: Client; bots: Bot[]; sparks: Record<string, number[]>; week: ClientStats | null; summary: DailySummary; summaryDayLabel: string; serverNow: number;
 }) {
   const [bots, setBots] = useState(initial);
-  const now = useClock();
+  const now = useClock(serverNow);
   const scoped = useScopedHref();
   const onBotUpdate = useCallback((b: Bot) => setBots((prev) => prev.map((x) => (x.id === b.id ? { ...x, ...b } : x))), []);
   const live = useLiveEvents({ clientId: client.id, bots, onBotUpdate });

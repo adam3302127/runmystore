@@ -8,9 +8,10 @@ import { ago, fmtInterval } from "@/lib/format";
 import { Sparkline } from "@/components/Sparkline";
 import { useScopedHref } from "@/components/ClientScope";
 
-/** Re-renders every 30 s so "seen 3m ago" and the health dot stay honest without a refresh. */
-export function useClock(ms = 30_000) {
-  const [now, setNow] = useState(() => Date.now());
+/** Re-renders every 30 s so "seen 3m ago" and the health dot stay honest without a refresh.
+ *  Seed it with the server's timestamp so the first client render matches the HTML. */
+export function useClock(initial?: number, ms = 30_000) {
+  const [now, setNow] = useState(() => initial ?? Date.now());
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), ms); return () => clearInterval(t); }, [ms]);
   return now;
 }

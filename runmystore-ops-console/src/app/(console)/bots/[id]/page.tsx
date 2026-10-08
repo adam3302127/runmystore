@@ -35,5 +35,5 @@ export default async function BotRoute({ params }: { params: Promise<{ id: strin
   for (const r of (activity ?? []) as { bucket: string; n: number; errors: number }[]) {
     const k = dayKey(r.bucket, DEFAULT_TZ); if (days[k]) { days[k].n += Number(r.n); days[k].errors += Number(r.errors); }
   }
-  return <BotPage bot={bot as Bot} client={client as Client} keys={(keys ?? []) as BotKey[]} runs={(runs ?? []) as BotRun[]} activity={Object.entries(days).map(([day, v]) => ({ day, ...v }))} isAdmin={viewer.isAdmin} />;
+  return <BotPage bot={bot as Bot} client={client as Client} keys={(keys ?? []) as BotKey[]} runs={(runs ?? []) as BotRun[]} activity={Object.entries(days).map(([day, v]) => ({ day, ...v }))} isAdmin={viewer.isAdmin} serverNow={nowMs} />;
 }

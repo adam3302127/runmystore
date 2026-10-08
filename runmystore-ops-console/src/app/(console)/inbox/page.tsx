@@ -3,6 +3,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { Inbox } from "@/components/Inbox";
 import { Eyebrow } from "@/components/Stripes";
 import type { Bot, Client, Event } from "@/lib/types";
+import { clock } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Inbox" };
 
@@ -23,7 +24,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
         <h1 className="display text-4xl">Every conversation, one place.</h1>
         <p className="text-sm text-dim">Email, WhatsApp, SMS and chat, grouped by thread. Contacts stay in Close; open them there.</p>
       </div>
-      <Inbox initial={(messages ?? []) as Event[]} bots={(bots ?? []) as Bot[]} clients={(clients ?? []) as Client[]} scope={scope} />
+      <Inbox initial={(messages ?? []) as Event[]} bots={(bots ?? []) as Bot[]} clients={(clients ?? []) as Client[]} scope={scope} serverNow={clock()} />
     </div>
   );
 }

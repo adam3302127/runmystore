@@ -10,9 +10,9 @@ import { Eyebrow, Empty } from "@/components/Stripes";
 import { useScopedHref } from "@/components/ClientScope";
 import Link from "next/link";
 
-export function FleetPage({ clients, bots: initial, sparks, scope }: { clients: Client[]; bots: Bot[]; sparks: Record<string, number[]>; scope: Client | null }) {
+export function FleetPage({ clients, bots: initial, sparks, scope, serverNow }: { clients: Client[]; bots: Bot[]; sparks: Record<string, number[]>; scope: Client | null; serverNow: number }) {
   const [bots, setBots] = useState(initial);
-  const now = useClock();
+  const now = useClock(serverNow);
   const scoped = useScopedHref();
   const onBotUpdate = useCallback((b: Bot) => setBots((prev) => prev.map((x) => (x.id === b.id ? { ...x, ...b } : x))), []);
   const live = useLiveEvents({ clientId: scope?.id, bots, onBotUpdate });

@@ -22,8 +22,8 @@ function sortItems(a: Item, b: Item) {
   return a.d.created_at < b.d.created_at ? -1 : 1;
 }
 
-export function DecisionsQueue({ open: initialOpen, answered: initialAnswered, bots, clients, scope, canAct, filterBot }: {
-  open: Item[]; answered: Item[]; bots: Bot[]; clients: Client[]; scope: Client | null; canAct: boolean; filterBot?: string;
+export function DecisionsQueue({ open: initialOpen, answered: initialAnswered, bots, clients, scope, canAct, filterBot, serverNow }: {
+  open: Item[]; answered: Item[]; bots: Bot[]; clients: Client[]; scope: Client | null; canAct: boolean; filterBot?: string; serverNow: number;
 }) {
   const [items, setItems] = useState<Item[]>(() => [...initialOpen].sort(sortItems));
   const [answered, setAnswered] = useState<Item[]>(initialAnswered);
@@ -35,7 +35,7 @@ export function DecisionsQueue({ open: initialOpen, answered: initialAnswered, b
   const [pending, start] = useTransition();
   const noteRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
   const scoped = useScopedHref();
-  const now = useClock();
+  const now = useClock(serverNow);
   const botsById = useMemo(() => new Map(bots.map((b) => [b.id, b])), [bots]);
   const clientsById = useMemo(() => new Map(clients.map((c) => [c.id, c])), [clients]);
 

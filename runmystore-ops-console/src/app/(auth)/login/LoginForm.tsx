@@ -1,8 +1,8 @@
 "use client";
 import { useActionState } from "react";
-import { sendMagicLink, type LoginState } from "./actions";
+import { sendMagicLink, signInWithGoogle, type LoginState } from "./actions";
 
-export function LoginForm({ next, initialError }: { next: string; initialError: string | null }) {
+export function LoginForm({ next, initialError, google }: { next: string; initialError: string | null; google: boolean }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(sendMagicLink, { ok: false, error: initialError });
   if (state.ok) {
     return (
@@ -23,6 +23,12 @@ export function LoginForm({ next, initialError }: { next: string; initialError: 
       <button className="btn justify-center" type="submit" disabled={pending}>
         {pending ? "Sending…" : "Email me a link"} <span className="arrow" aria-hidden="true">→</span>
       </button>
+      {google && (
+        <>
+          <p className="text-center text-xs text-dim">or</p>
+          <button className="btn ghost justify-center" type="submit" formAction={signInWithGoogle} disabled={pending}>Continue with Google</button>
+        </>
+      )}
     </form>
   );
 }

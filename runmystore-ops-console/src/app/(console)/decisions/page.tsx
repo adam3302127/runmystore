@@ -4,6 +4,7 @@ import { requireViewer } from "@/lib/viewer";
 import { DecisionsQueue } from "@/components/DecisionsQueue";
 import { Eyebrow } from "@/components/Stripes";
 import type { Bot, Client, Decision, Event } from "@/lib/types";
+import { clock } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Needs you" };
 
@@ -31,7 +32,7 @@ export default async function DecisionsPage({ searchParams }: { searchParams: Pr
         <h1 className="display text-4xl">Your calls, in order.</h1>
         <p className="text-sm text-dim">Highest priority first, then the soonest due. The bot picks up your answer on its next run.</p>
       </div>
-      <DecisionsQueue open={((open ?? []) as Decision[]).map(wrap)} answered={((done ?? []) as Decision[]).map(wrap)} bots={(bots ?? []) as Bot[]} clients={(clients ?? []) as Client[]} scope={scope} canAct={viewer.canAct} filterBot={bot} />
+      <DecisionsQueue open={((open ?? []) as Decision[]).map(wrap)} answered={((done ?? []) as Decision[]).map(wrap)} bots={(bots ?? []) as Bot[]} clients={(clients ?? []) as Client[]} scope={scope} canAct={viewer.canAct} filterBot={bot} serverNow={clock()} />
     </div>
   );
 }

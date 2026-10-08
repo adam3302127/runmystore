@@ -47,3 +47,6 @@ next-env.d.ts
 /screenshots/*.png
 /tests/results/
 /tests/report/
+/supabase/functions/.local-ca.crt
+/supabase/.temp/
+/supabase/.branches/

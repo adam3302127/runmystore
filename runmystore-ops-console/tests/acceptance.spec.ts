@@ -36,27 +36,27 @@ test("a new event appears in the open feed in under 2 s without a refresh", asyn
   await signIn(page, owner.email);
   await page.goto("/");
   await expect(page.getByTestId("live-feed")).toBeVisible();
-  await expect(page.getByTestId("live-feed").getByText(/^Live/)).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId("live-feed").getByRole("status").filter({ hasText: /^Live/ })).toBeVisible({ timeout: 15_000 });
   const marker = `Live check ${uid()}`;
   const t0 = Date.now();
   const r = await ingest(careKey.key, { type: "action", summary: marker, idempotency_key: `pw:${uid()}` });
   expect(r.status).toBe(201);
-  await expect(page.getByTestId("feed-rows").getByText(marker)).toBeVisible({ timeout: 2000 });
+  await expect(page.getByTestId("feed-rows").locator("li[data-event-id]", { hasText: marker })).toBeVisible({ timeout: 2000 });
   expect(Date.now() - t0).toBeLessThan(2500);
 });
 
 test("a paused feed shows +N new and does not reflow until Play", async ({ page }) => {
   await signIn(page, owner.email);
   await page.goto("/");
-  await expect(page.getByTestId("live-feed").getByText(/^Live/)).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId("live-feed").getByRole("status").filter({ hasText: /^Live/ })).toBeVisible({ timeout: 15_000 });
   await page.getByTestId("feed-pause").click();
   await expect(page.getByTestId("feed-pause")).toHaveText("Play");
   const marker = `Paused check ${uid()}`;
   await ingest(careKey.key, { type: "action", summary: marker, idempotency_key: `pw:${uid()}` });
   await expect(page.getByTestId("feed-queued")).toContainText("+1 new", { timeout: 5000 });
-  await expect(page.getByTestId("feed-rows").getByText(marker)).toHaveCount(0);
+  await expect(page.getByTestId("feed-rows").locator("li[data-event-id]", { hasText: marker })).toHaveCount(0);
   await page.getByTestId("feed-pause").click();
-  await expect(page.getByTestId("feed-rows").getByText(marker)).toBeVisible();
+  await expect(page.getByTestId("feed-rows").locator("li[data-event-id]", { hasText: marker })).toBeVisible();
 });
 
 test("a scoped operator sees only Northside Candle: screens, API, realtime", async ({ page }) => {
@@ -73,7 +73,7 @@ test("a scoped operator sees only Northside Candle: screens, API, realtime", asy
   // Realtime: a Fresh Bros event must not reach the operator's feed
   const marker = `Scoped leak check ${uid()}`;
   await page.goto("/");
-  await expect(page.getByTestId("live-feed").getByText(/^Live/)).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId("live-feed").getByRole("status").filter({ hasText: /^Live/ })).toBeVisible({ timeout: 15_000 });
   await ingest(careKey.key, { type: "action", summary: marker, idempotency_key: `pw:${uid()}` });
   await page.waitForTimeout(2500);
   await expect(page.getByText(marker)).toHaveCount(0);
@@ -131,7 +131,7 @@ test("answering a decision resolves its event, drops the badge live, and the bot
 test("viewer can read but not act", async ({ page }) => {
   await signIn(page, viewer.email);
   await page.goto("/decisions");
-  await expect(page.getByText("Viewers can read decisions")).toBeVisible();
+  await expect(page.getByText("Viewers can read decisions").first()).toBeVisible();
   await expect(page.getByTestId("answer-approve")).toHaveCount(0);
 });
 
@@ -140,7 +140,7 @@ test("under reduced motion there are no entrance or pulse animations", async ({ 
   const page = await ctx.newPage();
   await signIn(page, owner.email);
   await page.goto("/");
-  await expect(page.getByTestId("live-feed").getByText(/^Live/)).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId("live-feed").getByRole("status").filter({ hasText: /^Live/ })).toBeVisible({ timeout: 15_000 });
   const dotAnim = await page.locator(".dot.live").first().evaluate((el) => getComputedStyle(el).animationName);
   expect(dotAnim).toBe("none");
   const marker = `Reduced motion ${uid()}`;

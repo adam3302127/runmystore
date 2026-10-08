@@ -29,8 +29,8 @@ export function TopBar({ viewer, fleet }: { viewer: Viewer; fleet: { live: numbe
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-3">
-          <button type="button" className="pill sm hidden sm:inline-flex" onClick={() => setOpen(true)} aria-label="Search (Command K)">
-            Search <kbd>⌘K</kbd>
+          <button type="button" className="pill sm hidden sm:inline-flex" onClick={() => setOpen(true)} title="Search anything (Command K)">
+            Search <kbd aria-hidden="true">⌘K</kbd>
           </button>
           <ClientSwitcher />
           <span className="hidden sm:inline-flex"><ConnectionPill detail={`${fleet.live}/${fleet.total} bots`} /></span>

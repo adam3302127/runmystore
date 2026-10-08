@@ -17,11 +17,11 @@ import { createBotKey, revokeBotKey } from "@/app/actions";
 import { curlSnippet, envBlock, LOGGING_INSTRUCTION } from "@/lib/bot-snippet";
 import { useScopedHref } from "@/components/ClientScope";
 
-export function BotPage({ bot: initial, client, keys: initialKeys, runs: initialRuns, activity, isAdmin }: {
-  bot: Bot; client: Client; keys: BotKey[]; runs: BotRun[]; activity: { day: string; n: number; errors: number }[]; isAdmin: boolean;
+export function BotPage({ bot: initial, client, keys: initialKeys, runs: initialRuns, activity, isAdmin, serverNow }: {
+  bot: Bot; client: Client; keys: BotKey[]; runs: BotRun[]; activity: { day: string; n: number; errors: number }[]; isAdmin: boolean; serverNow: number;
 }) {
   const [bot, setBot] = useState(initial);
-  const now = useClock();
+  const now = useClock(serverNow);
   const scoped = useScopedHref();
   const params = useSearchParams();
   const onBotUpdate = useCallback((b: Bot) => { if (b.id === bot.id) setBot((p) => ({ ...p, ...b })); }, [bot.id]);
@@ -146,7 +146,7 @@ export function BotPage({ bot: initial, client, keys: initialKeys, runs: initial
             </ol>
             {!live.loading && live.events.length === 0 && <p className="text-sm text-dim">No events yet. Paste the logging instruction into this bot and run it.</p>}
           </section>
-          {isAdmin && <KeysPanel bot={bot} keys={initialKeys} />}
+          {isAdmin && <KeysPanel bot={bot} keys={initialKeys} now={now} />}
           <section className="card p-4 grid gap-3" aria-label="Logging instruction">
             <h2 className="title">Paste into the bot</h2>
             <p className="text-xs text-dim">Set the three env vars on the bot, then add this paragraph to its prompt.</p>
@@ -160,7 +160,7 @@ export function BotPage({ bot: initial, client, keys: initialKeys, runs: initial
   );
 }
 
-function KeysPanel({ bot, keys: initial }: { bot: Bot; keys: BotKey[] }) {
+function KeysPanel({ bot, keys: initial, now }: { bot: Bot; keys: BotKey[]; now: number }) {
   const [keys, setKeys] = useState(initial);
   const [label, setLabel] = useState("");
   const [fresh, setFresh] = useState<string | null>(null);
@@ -175,7 +175,7 @@ function KeysPanel({ bot, keys: initial }: { bot: Bot; keys: BotKey[] }) {
         {keys.map((k) => (
           <li key={k.id} className="flex flex-wrap items-center gap-2 text-sm">
             <code className="rounded bg-ink px-2 py-0.5">rmsb_{k.prefix}_…</code>
-            <span className="text-dim text-xs">{k.label ?? "no label"} · created <Time iso={k.created_at} mode="date" />{k.last_used_at ? <> · used {ago(k.last_used_at)}</> : " · never used"}</span>
+            <span className="text-dim text-xs">{k.label ?? "no label"} · created <Time iso={k.created_at} mode="date" />{k.last_used_at ? <> · used {ago(k.last_used_at, now)}</> : " · never used"}</span>
             {k.revoked_at ? <span className="tag skip">revoked</span> : (
               <button type="button" className="pill sm ml-auto" disabled={pending} onClick={() => { if (!confirm(`Revoke key rmsb_${k.prefix}_…? The bot gets 401 immediately.`)) return; start(async () => { const r = await revokeBotKey(k.id, bot.id); if (!r.ok) setErr(r.error); else refresh(); }); }}>Revoke</button>
             )}

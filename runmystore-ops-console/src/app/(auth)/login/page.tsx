@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Stripes } from "@/components/Stripes";
 import { LoginForm } from "./LoginForm";
+import { GOOGLE_AUTH } from "@/lib/env";
 
 export const metadata: Metadata = { title: "Sign in" };
 
@@ -15,7 +16,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <h1 className="display text-3xl">Sign in</h1>
             <p className="text-dim text-sm">Team only. We email you a one-tap link, no password.</p>
           </div>
-          <LoginForm next={next ?? "/"} initialError={error === "link" ? "That link has expired or was already used. Ask for a new one." : null} />
+          <LoginForm next={next ?? "/"} google={GOOGLE_AUTH} initialError={error === "link" ? "That link has expired or was already used. Ask for a new one." : error === "google" ? "Google sign-in didn't start. Try the email link." : null} />
         </section>
       </div>
     </main>

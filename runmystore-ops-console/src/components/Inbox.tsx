@@ -9,6 +9,7 @@ import { closeLeadUrl } from "@/lib/feed-mapping";
 import { Time } from "@/components/TimeZone";
 import { Empty } from "@/components/Stripes";
 import { ago } from "@/lib/format";
+import { useClock } from "@/components/BotCard";
 
 type Thread = { key: string; who: string; handle: string | null; channel: string | null; last: Event; count: number; botName: string; clientName: string; closeId: string | null; hasDecision: boolean };
 const threadKey = (e: Event) => e.thread_ref ?? e.counterparty_handle ?? e.id;
@@ -18,7 +19,8 @@ function ChannelIcon({ ch }: { ch: string | null }) {
   return <span className="grid h-8 w-8 flex-none place-items-center rounded-full bg-ink-3 text-xs font-bold" aria-label={ch ? CHANNEL_LABEL[ch as keyof typeof CHANNEL_LABEL] : "message"} title={ch ?? ""}>{glyph}</span>;
 }
 
-export function Inbox({ initial, bots, clients, scope }: { initial: Event[]; bots: Bot[]; clients: Client[]; scope: Client | null }) {
+export function Inbox({ initial, bots, clients, scope, serverNow }: { initial: Event[]; bots: Bot[]; clients: Client[]; scope: Client | null; serverNow: number }) {
+  const now = useClock(serverNow);
   const params = useSearchParams(); const router = useRouter(); const pathname = usePathname();
   const selected = params.get("thread");
   const live = useLiveEvents({ clientId: scope?.id, bots, types: ["message_sent", "message_received"], limit: 0 });
@@ -67,7 +69,7 @@ export function Inbox({ initial, bots, clients, scope }: { initial: Event[]; bot
                   <span className="truncate text-sm text-dim">{t.last.direction === "outbound" ? "↗ " : "↙ "}{t.last.summary}</span>
                   <span className="truncate text-xs text-faint">{t.botName}{scope ? "" : ` · ${t.clientName}`} · {t.count} msg</span>
                 </span>
-                <span className="text-xs text-dim">{ago(t.last.occurred_at)}</span>
+                <span className="text-xs text-dim">{ago(t.last.occurred_at, now)}</span>
               </button>
             </li>
           ))}

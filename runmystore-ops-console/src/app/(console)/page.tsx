@@ -22,5 +22,5 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
     if (idx < 0 || idx > 23) continue;
     (sparks[row.bot_id] ??= new Array(24).fill(0))[idx] = Number(row.n);
   }
-  return <FleetPage clients={(clients ?? []) as Client[]} bots={visibleBots} sparks={sparks} scope={scope} />;
+  return <FleetPage clients={(clients ?? []) as Client[]} bots={visibleBots} sparks={sparks} scope={scope} serverNow={nowMs} />;
 }

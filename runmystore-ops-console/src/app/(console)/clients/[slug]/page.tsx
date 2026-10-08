@@ -36,5 +36,5 @@ export default async function ClientRoute({ params }: { params: Promise<{ slug: 
   }
   const bl = (bots ?? []) as Bot[];
   return <ClientPage client={c} bots={bl} sparks={sparks} week={((week ?? []) as ClientStats[]).find((s) => s.client_id === c.id) ?? null}
-    summary={dailySummary(yesterday, (yEvents ?? []) as Event[], bl)} summaryDayLabel={fmtDayHeading(yFrom, c.timezone)} />;
+    summary={dailySummary(yesterday, (yEvents ?? []) as Event[], bl)} summaryDayLabel={fmtDayHeading(yFrom, c.timezone)} serverNow={nowMs} />;
 }
