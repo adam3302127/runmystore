@@ -72,6 +72,16 @@ Then drive it: `npm run simulate -- --minutes 2` (reads `SIM_INGEST_URL` and `SI
 | `npm run screenshots` | Writes `screenshots/*-desktop.png` (1440) and `*-phone.png` (390) |
 | `npm run typecheck && npm run lint` | TypeScript strict + Next/React Compiler lint rules |
 
+### If `supabase db push` cannot reach the database
+
+Some networks (this build's sandbox included) block raw Postgres connections. `scripts/hosted-sql.mjs` applies any SQL file over HTTPS through the Supabase Management API instead:
+
+```bash
+SUPABASE_ACCESS_TOKEN=sbp_… SUPABASE_PROJECT_REF=<ref> node scripts/hosted-sql.mjs supabase/migrations/0002_ops_console.sql
+```
+
+It runs as `postgres`, so `create_bot_key` works from it too. Behind a proxy, add `NODE_USE_ENV_PROXY=1`.
+
 ## Backfilling history
 
 Events in the contract format, one JSON object per line (`care_flow_events.jsonl`). Lines may carry `"bot": "<slug>"` to route to another bot of the same client.
@@ -130,6 +140,7 @@ See [DEPLOY.md](./DEPLOY.md) for the step-by-step checklist (Supabase project, f
 | `SUPABASE_SERVICE_ROLE_KEY` | Vercel (server) + `.env.local` | secret (`sb_secret_…`) or legacy service_role key. Used only by the team-invite action and the settings email lookup. Never `NEXT_PUBLIC_` |
 | `NEXT_PUBLIC_SITE_URL` | Vercel | `https://ops.runmystore.com`, used in magic-link redirects |
 | `NEXT_PUBLIC_DEFAULT_TZ` | optional | default `America/New_York`; the browser's zone wins after load |
+| `NEXT_PUBLIC_GOOGLE_AUTH` | optional | `1` shows "Continue with Google" on /login. Enable the Google provider in Supabase (Authentication → Providers) with a Google OAuth client first; only addresses already on the team get in |
 | `SIM_INGEST_URL`, `SIM_BOT_KEYS` | `.env.local` only | simulator; keys printed by the seed |
 | `DATABASE_URL` | shell only | importer and SQL tests |
 

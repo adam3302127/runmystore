@@ -2,6 +2,14 @@
 
 Everything below is done once. Items marked **you** need the account owner; the rest can be run from the repo with the tokens.
 
+## Status (Oct 8, 2026)
+- [x] Supabase project `vtgvbxzmadnisovgexav` (East US): migrations 0001 + 0002 applied, seed loaded (5,085 events, 41 bots, 9 open decisions), `ingest` and `bot-inbox` deployed with `--no-verify-jwt`, curl checkpoint 201 / 200 duplicate / 401 / 422 / inbox 200.
+- [x] Auth: public sign-ups off, magic link on, site URL `https://ops.runmystore.com`, redirect allow-list set. Google provider: off until a Google OAuth client id + secret exist.
+- [x] Owner: `adam@runmystore.com` invited (check the inbox for the Supabase invite) and `team_members` row created as owner.
+- [x] Vercel project `rms-ops-console` (root = this folder), production env vars set, deployed: https://rms-ops-console.vercel.app
+- [ ] DNS at SiteGround for `ops.runmystore.com` (two records, see step 4). Until then use the vercel.app URL.
+- [ ] Google sign-in (optional): create a Google OAuth client, add the id + secret under Authentication → Providers → Google, then set `NEXT_PUBLIC_GOOGLE_AUTH=1` on Vercel and redeploy.
+
 ## 1. Supabase project
 - [ ] **you** Create the project (Free for the trial): https://supabase.com/dashboard → New project → `rms-ops-console`, generate a DB password and save it, region East US (N. Virginia).
 - [ ] **you** Project Settings → General → copy the Project ID (`<ref>`). Project Settings → API Keys → copy the publishable key and reveal + copy the secret key.
@@ -46,7 +54,7 @@ select id, 'Adam', 'owner', true from auth.users where email = '<owner email>';
 - [ ] Import the repo. **Root Directory: `runmystore-ops-console`.** Framework: Next.js (auto). Production branch: `main` (or the feature branch while on trial).
 - [ ] Environment variables (Production + Preview): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (publishable), `SUPABASE_SERVICE_ROLE_KEY` (secret, server-only), `NEXT_PUBLIC_SITE_URL=https://ops.runmystore.com`.
 - [ ] Deploy. Open `/login`, request a link, sign in, see the fleet.
-- [ ] Domains → add `ops.runmystore.com`. **you** At the registrar add `CNAME ops → cname.vercel-dns.com`. Wait for the certificate.
+- [x] Domains → `ops.runmystore.com` added to the project. **you** DNS lives at SiteGround (ns1/ns2.siteground.net). Add two records: `CNAME ops → cname.vercel-dns.com` and `TXT _vercel → vc-domain-verify=ops.runmystore.com,5797ef4d11252a80f4e7` (the TXT proves you own the apex, since runmystore.com itself is not on Vercel). The certificate issues itself within minutes of the records resolving.
 
 ## 5. Prove it live
 - [ ] `.env.local`: `SIM_INGEST_URL=https://<ref>.supabase.co/functions/v1/ingest`, `SIM_BOT_KEYS=<from the seed>` → `npm run simulate -- --minutes 2` while the fleet page is open: rows drop in, counters tick, a Needs you card appears within a minute.
